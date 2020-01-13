@@ -1,19 +1,83 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const login = require('./routes/login');
+const User = require('./models/User');
 
-//const login = require('./routes/login');
-
+// Express setup
 const app = express();
 app.use(express.json());
+app.use('/', login);
+const port = process.env.PORT || 5000;
+
+// Database connection
 const db = require('./config/keys').mongoURI;
-mongoose.connect(db)
+mongoose.connect(db, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false
+    })
     .then(() => console.log('MongoDB Connected...'))
     .catch(err => console.log(err));
 
-// Use routes
-//app.use('/login', login);
+// Socket.io connection
+const server = require('http').Server(app);
+const io = require('socket.io').listen(server);
 
-const port = process.env.PORT || 5000;
+const players = {};
 
-app.listen(port, () => console.log(`Server started on port ${port}`));
+io.use((socket, next) => {
+    const { id, token } = socket.handshake.query;
+    if (id && token){
+        User.findOne({ id }) // Compare token
+        .then(user => {
+            if(!user) return next(new Error('User does not exist'));
+            // Validate password
+            bcrypt.compare(token, user.token)
+            .then(isMatch => {
+                if(!isMatch) return next(new Error('Token is incorrect'));
+                // If another instance is online, kick it
+                Object.keys(players).forEach((socketid) => {
+                    if (players[socketid].discordId === id)io.sockets.connected[socketid].disconnect(true);
+                });
+                return next();
+            })
+        });
+    } 
+    return next(new Error('Authentication error'));
+});
+io.on('connection', (socket) => {
+    console.log(`A user connected with socket id ${socket.id} and discord id ${socket.handshake.query.id}`);
+    players[socket.id] = {
+        x: Math.floor(Math.random() * 400) + 50,
+        y: Math.floor(Math.random() * 500) + 50,
+        dir: 'down',
+        playerId: socket.id,
+        discordId: socket.handshake.query.id,
+    };
+    // send the players object to the new player
+    socket.emit('currentPlayers', players);
 
+    // update all other players of the new player
+    socket.broadcast.emit('newPlayer', players[socket.id]);
+
+    // when a player disconnects, remove them from our players object
+    socket.on('disconnect', () => {
+        console.log('User disconnected: ', socket.id);
+        delete players[socket.id];
+        // emit a message to all players to remove this player
+        io.emit('playerDisconnect', socket.id);
+    });
+     
+    // when a plaayer moves, update the player data
+    socket.on('playerMovement', (movementData) => {
+        players[socket.id].x = movementData.x;
+        players[socket.id].y = movementData.y;
+        players[socket.id].dir = movementData.dir;
+        // emit a message to all players about the player that moved
+        socket.broadcast.emit('playerMoved', players[socket.id]);
+    });
+});
+
+server.listen(port, () => console.log(`Server started on port ${port}`));
