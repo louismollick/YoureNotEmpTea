@@ -28,7 +28,8 @@
     "express": "^4.17.1",
     "form-data": "^3.0.0",
     "mongoose": "^5.8.5",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
