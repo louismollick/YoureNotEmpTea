@@ -6,7 +6,7 @@
   "scripts": {
     "client-install": "npm install --prefix client",
     "start": "node server.js",
-    "server": "nodemon server.js",
+    "server": "NODE_ENV=development nodemon server.js",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
@@ -25,6 +25,7 @@
     "axios": "^0.19.0",
     "bcryptjs": "^2.4.3",
     "concurrently": "^5.0.2",
+    "dotenv-flow": "^3.1.0",
     "express": "^4.17.1",
     "form-data": "^3.0.0",
     "mongoose": "^5.8.5",

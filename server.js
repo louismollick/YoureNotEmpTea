@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const path = require('path');
+const dotenv = require('dotenv');
 const login = require('./routes/login');
 const User = require('./models/User');
 
@@ -10,7 +11,10 @@ const app = express();
 app.use(express.json());
 app.use('/', login);
 
-// Serve static assets if in production
+// Load env variables
+require('dotenv-flow').config();
+
+// Serve static assets if in production & set env vars
 if (process.env.NODE_ENV === 'production'){
     app.use(express.static('client/build'));
     app.get('*', (req, res) => {
@@ -20,7 +24,7 @@ if (process.env.NODE_ENV === 'production'){
 const port = process.env.PORT || 5000;
 
 // Database connection
-const db = require('./config/keys').mongoURI;
+const db = process.env.MONGO_URI;
 mongoose.connect(db, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -56,6 +60,7 @@ io.use((socket, next) => {
     } 
     return next(new Error('Authentication error'));
 });
+
 io.on('connection', (socket) => {
     console.log(`A user connected with socket id ${socket.id} and discord id ${socket.handshake.query.id}`);
     players[socket.id] = {
