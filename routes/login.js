@@ -6,7 +6,6 @@ const bcrypt = require('bcryptjs');
 
 // User model
 const User = require('../models/User');
-const KEYS = require('../config/keys');
 
 // @route   POST login
 // @desc    Login or create a user
@@ -106,9 +105,9 @@ router.post('/token', (req, res) => {
 function queryToken(tokenType, tokenKey){
 	// Use same function for authorization code and refresh token (tokenType)
 	const data = new FormData();
-	data.append('client_id', process.env.REACT_APP_DISCORD_ID);
-	data.append('client_secret', KEYS.discordPass);
-	data.append('redirect_uri', process.env.REACT_APP_CLIENT_URI);
+	data.append('client_id', process.env.DISCORD_ID);
+	data.append('client_secret', process.env.DISCORD_PASS);
+	data.append('redirect_uri', process.env.CLIENT_URI);
 	data.append('scope', 'identify');
 	data.append(tokenType, tokenKey);
 	data.append('grant_type', (tokenType === 'code') ? 'authorization_code' : 'refresh_token');

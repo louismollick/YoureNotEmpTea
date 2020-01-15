@@ -13,7 +13,7 @@ const MenuButton = ({ user }) => {
             </DropdownToggle>
             <DropdownMenu>
                 <DropdownItem disabled>
-                    <div>Logged in as <img style={{width: 30 + 'px'}} className="rounded-circle" src={`https://cdn.discordapp.com/avatars/${id}/a_${avatar}.png?size=128`}/> {username}#{discriminator}</div>
+                    <div>Logged in as <img alt="" style={{width: 30 + 'px'}} className="rounded-circle" src={`https://cdn.discordapp.com/avatars/${id}/a_${avatar}.png?size=128`}/> {username}#{discriminator}</div>
                 </DropdownItem>
                 <DropdownItem>Logout</DropdownItem>
             </DropdownMenu>
