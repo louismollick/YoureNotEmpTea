@@ -9,7 +9,7 @@ const User = require('./models/User');
 // Express setup
 const app = express();
 app.use(express.json());
-app.use('/', login);
+app.use('/api/', login);
 
 // Load env variables
 require('dotenv-flow').config();
