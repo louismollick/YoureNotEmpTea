@@ -25,7 +25,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create () {
-        this.socket = io(`https://notemptea.herokuapp.com/?id=${window.discord.id}&token=${window.discord.token}`);
+        this.socket = io(`${process.env.REACT_APP_SERVER_URI}?id=${window.discord.id}&token=${window.discord.token}`);
         
         const self = this;
         this.otherPlayers = this.physics.add.group();

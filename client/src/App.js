@@ -30,7 +30,7 @@ export default function App() {
       const token = getFromStorage('token');
       if(token){
         try{
-          const login = await axios.post('/login', { token });
+          const login = await axios.post('/api/login', { token });
           const { data } = login;
           if(data.success){
             // Logged in successfully, can now render Canvas with player info

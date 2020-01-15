@@ -32,7 +32,7 @@ export function generateRandomString() {
 }
 
 export function getToken(method, code){
-    return axios.post('/token', { method, code })
+    return axios.post('/api/token', { method, code })
       .then(res => {
         const { data } = res;
         if(data.success){
